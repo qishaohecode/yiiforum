@@ -154,7 +154,9 @@ class PostController extends BaseFrontController
     }
     
     public function actionTest(){
-    	$postHandle = new PostHandle();
-    	$postHandle->getTopPost();
+    	//$postHandle = new PostHandle();
+    	//$post = $postHandle->getTopPost();
+    	$post = array("alias"=>"xxx","title"=>"你好");
+    	return  $this->render('index.tpl', ['post' => $post]);
     }
 }

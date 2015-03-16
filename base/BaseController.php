@@ -139,4 +139,18 @@ class BaseController extends Controller
 	{
 		return 'no permission';
 	}
+	
+	/**
+	Smarty assign()方法
+	*/
+	public function assign($key, $value) {
+		\Yii::$app->smarty -> assign($key, $value);
+	}
+	
+	/**
+	Smarty display()方法
+	*/
+	public function display($view) {
+		\Yii::$app->smarty -> display($view);
+	}
 }
