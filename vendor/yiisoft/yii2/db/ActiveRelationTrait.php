@@ -215,7 +215,7 @@ trait ActiveRelationTrait
             $this->filterByModels($primaryModels);
         }
 
-        if (count($primaryModels) === 1 && !$this->multiple) {
+        if (!$this->multiple && count($primaryModels) === 1) {
             $model = $this->one();
             foreach ($primaryModels as $i => $primaryModel) {
                 if ($primaryModel instanceof ActiveRecordInterface) {
@@ -391,6 +391,15 @@ trait ActiveRelationTrait
         return $buckets;
     }
 
+
+    /**
+     * Indexes buckets by column name.
+     *
+     * @param array $buckets
+     * @var string|callable $column the name of the column by which the query results should be indexed by.
+     * This can also be a callable (e.g. anonymous function) that returns the index value based on the given row data.
+     * @return array
+     */
     private function indexBuckets($buckets, $indexBy)
     {
         $result = [];

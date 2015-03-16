@@ -48,7 +48,7 @@ class AssetManager extends Component
      * The array values are the corresponding configurations. If a value is false, it means the corresponding asset
      * bundle is disabled and [[getBundle()]] should return null.
      *
-     * If this this property is false, it means the whole asset bundle feature is disabled and [[getBundle()]]
+     * If this property is false, it means the whole asset bundle feature is disabled and [[getBundle()]]
      * will always return null.
      *
      * The following example shows how to disable the bootstrap css file used by Bootstrap widgets
@@ -150,6 +150,15 @@ class AssetManager extends Component
      * significantly degrade the performance.
      */
     public $forceCopy = false;
+    /**
+     * @var boolean whether to append a timestamp to the URL of every published asset. When this is true,
+     * the URL of a published asset may look like `/path/to/asset?v=timestamp`, where `timestamp` is the
+     * last modification time of the published asset file.
+     * You normally would want to set this property to true when you have enabled HTTP caching for assets,
+     * because it allows you to bust caching when the assets are updated.
+     * @since 2.0.3
+     */
+    public $appendTimestamp = false;
 
     private $_dummyBundles = [];
 
@@ -178,7 +187,7 @@ class AssetManager extends Component
      * This method will first look for the bundle in [[bundles]]. If not found,
      * it will treat `$name` as the class of the asset bundle and create a new instance of it.
      *
-     * @param string $name the class name of the asset bundle
+     * @param string $name the class name of the asset bundle (without the leading backslash)
      * @param boolean $publish whether to publish the asset files in the asset bundle before it is returned.
      * If you set this false, you must manually call `AssetBundle::publish()` to publish the asset files.
      * @return AssetBundle the asset bundle instance
@@ -201,6 +210,15 @@ class AssetManager extends Component
         }
     }
 
+    /**
+     * Loads asset bundle class by name
+     *
+     * @param string $name bundle name
+     * @param array $config bundle object configuration
+     * @param boolean $publish if bundle should be published
+     * @return AssetBundle
+     * @throws InvalidConfigException if configuration isn't valid
+     */
     protected function loadBundle($name, $config = [], $publish = true)
     {
         if (!isset($config['class'])) {
@@ -214,10 +232,17 @@ class AssetManager extends Component
         return $bundle;
     }
 
+    /**
+     * Loads dummy bundle by name
+     *
+     * @param string $name
+     * @return AssetBundle
+     */
     protected function loadDummyBundle($name)
     {
         if (!isset($this->_dummyBundles[$name])) {
             $this->_dummyBundles[$name] = $this->loadBundle($name, [
+                'sourcePath' => null,
                 'js' => [],
                 'css' => [],
                 'depends' => [],
@@ -236,9 +261,22 @@ class AssetManager extends Component
     public function getAssetUrl($bundle, $asset)
     {
         if (($actualAsset = $this->resolveAsset($bundle, $asset)) !== false) {
-            return Url::isRelative($actualAsset) ? $this->baseUrl . '/' . $actualAsset : $actualAsset;
+            $asset = $actualAsset;
+            $basePath = $this->basePath;
+            $baseUrl = $this->baseUrl;
         } else {
-            return Url::isRelative($asset) ? $bundle->baseUrl . '/' . $asset : $asset;
+            $basePath = $bundle->basePath;
+            $baseUrl = $bundle->baseUrl;
+        }
+
+        if (!Url::isRelative($asset)) {
+            return $asset;
+        }
+
+        if ($this->appendTimestamp && ($timestamp = @filemtime("$basePath/$asset")) > 0) {
+            return "$baseUrl/$asset?v=$timestamp";
+        } else {
+            return "$baseUrl/$asset";
         }
     }
 
@@ -432,7 +470,7 @@ class AssetManager extends Component
             if (!is_dir($dstDir)) {
                 symlink($src, $dstDir);
             }
-        } elseif (!is_dir($dstDir) || !empty($options['forceCopy']) || (!isset($options['forceCopy']) && $this->forceCopy)) {
+        } elseif (!empty($options['forceCopy']) || ($this->forceCopy && !isset($options['forceCopy'])) || !is_dir($dstDir)) {
             $opts = [
                 'dirMode' => $this->dirMode,
                 'fileMode' => $this->fileMode,

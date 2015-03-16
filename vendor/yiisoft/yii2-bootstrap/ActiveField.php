@@ -51,7 +51,7 @@ use yii\helpers\ArrayHelper;
  * ```php
  * use yii\bootstrap\ActiveForm;
  *
- * $form = ActiveForm::begin(['layout' => 'horizontal'])
+ * $form = ActiveForm::begin(['layout' => 'horizontal']);
  *
  * // Form field without label
  * echo $form->field($model, 'demo', [
@@ -71,17 +71,17 @@ use yii\helpers\ArrayHelper;
  * ]);
  *
  * // With 'default' layout you would use 'template' to size a specific field:
- * // echo $form->field($model, 'demo', [
- * //     'template' => '{label} <div class="row"><div class="col-sm-4">{input}{error}{hint}</div></div>'
- * // ]);
+ * echo $form->field($model, 'demo', [
+ *     'template' => '{label} <div class="row"><div class="col-sm-4">{input}{error}{hint}</div></div>'
+ * ]);
  *
- *  // Input group
- *  echo $form->field($model, 'demo', [
- *      'inputTemplate' => '<div class="input-group"><span class="input-group-addon">@</span>{input}</div>',
- *  ]);
+ * // Input group
+ * echo $form->field($model, 'demo', [
+ *     'inputTemplate' => '<div class="input-group"><span class="input-group-addon">@</span>{input}</div>',
+ * ]);
  *
- *  ActiveForm::end();
- *  ```
+ * ActiveForm::end();
+ * ```
  *
  * @see \yii\bootstrap\ActiveForm
  * @see http://getbootstrap.com/css/#forms
@@ -92,7 +92,7 @@ use yii\helpers\ArrayHelper;
 class ActiveField extends \yii\widgets\ActiveField
 {
     /**
-     * @var bool whether to render [[checkboxList()]] and [[radioList()]] inline.
+     * @var boolean whether to render [[checkboxList()]] and [[radioList()]] inline.
      */
     public $inline = false;
     /**
@@ -137,11 +137,11 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     public $inlineRadioListTemplate = "{label}\n{beginWrapper}\n{input}\n{error}\n{endWrapper}\n{hint}";
     /**
-     * @var bool whether to render the error. Default is `true` except for layout `inline`.
+     * @var boolean whether to render the error. Default is `true` except for layout `inline`.
      */
     public $enableError = true;
     /**
-     * @var bool whether to render the label. Default is `true`.
+     * @var boolean whether to render the label. Default is `true`.
      */
     public $enableLabel = true;
 
@@ -153,7 +153,7 @@ class ActiveField extends \yii\widgets\ActiveField
     {
         $layoutConfig = $this->createLayoutConfig($config);
         $config = ArrayHelper::merge($layoutConfig, $config);
-        return parent::__construct($config);
+        parent::__construct($config);
     }
 
     /**
@@ -303,13 +303,13 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-     * @param bool $value whether to render a inline list
+     * @param boolean $value whether to render a inline list
      * @return static the field object itself
      * Make sure you call this method before [[checkboxList()]] or [[radioList()]] to have any effect.
      */
     public function inline($value = true)
     {
-        $this->inline = (bool)$value;
+        $this->inline = (bool) $value;
         return $this;
     }
 

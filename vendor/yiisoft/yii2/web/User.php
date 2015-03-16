@@ -172,6 +172,7 @@ class User extends Component
     {
         if ($this->_identity === false) {
             if ($this->enableSession && $autoRenew) {
+                $this->_identity = null;
                 $this->renewAuthStatus();
             } else {
                 return null;
@@ -231,8 +232,6 @@ class User extends Component
      */
     public function login(IdentityInterface $identity, $duration = 0)
     {
-//     	var_dump($identity);
-//     	exit();
         if ($this->beforeLogin($identity, false, $duration)) {
             $this->switchIdentity($identity, $duration);
             $id = $identity->getId();
@@ -424,10 +423,12 @@ class User extends Component
             $this->setReturnUrl($request->getUrl());
         }
         if ($this->loginUrl !== null) {
-            return Yii::$app->getResponse()->redirect($this->loginUrl);
-        } else {
-            throw new ForbiddenHttpException(Yii::t('yii', 'Login Required'));
+            $loginUrl = (array)$this->loginUrl;
+            if ($loginUrl[0] !== Yii::$app->requestedRoute) {
+                return Yii::$app->getResponse()->redirect($this->loginUrl);
+            }
         }
+        throw new ForbiddenHttpException(Yii::t('yii', 'Login Required'));
     }
 
     /**
@@ -540,12 +541,9 @@ class User extends Component
             $identity->getId(),
             $identity->getAuthKey(),
             $duration,
-        ]);
-        //var_dump($cookie->value);
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $cookie->expire = time() + $duration;
         Yii::$app->getResponse()->getCookies()->add($cookie);
-        //print_r(Yii::$app->getResponse()->getCookies());
-        //exit();
     }
 
     /**
@@ -618,7 +616,7 @@ class User extends Component
 
         $this->setIdentity($identity);
 
-        if (($this->authTimeout !== null || $this->absoluteAuthTimeout !== null) && $identity !== null) {
+        if ($identity !== null && ($this->authTimeout !== null || $this->absoluteAuthTimeout !== null)) {
             $expire = $this->authTimeout !== null ? $session->get($this->authTimeoutParam) : null;
             $expireAbsolute = $this->absoluteAuthTimeout !== null ? $session->get($this->absoluteAuthTimeoutParam) : null;
             if ($expire !== null && $expire < time() || $expireAbsolute !== null && $expireAbsolute < time()) {
