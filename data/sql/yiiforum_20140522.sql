@@ -1,2 +1,0 @@
-ALTER TABLE  `post` CHANGE  `create_time`  `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ;
-ALTER TABLE  `thread` CHANGE  `create_time`  `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ;
