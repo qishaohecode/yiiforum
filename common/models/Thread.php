@@ -100,7 +100,11 @@ class Thread extends BaseActiveRecord
 						],
 						'string',
 						'max' => 64
-				]
+				],
+				[
+					['subjuect_image'],
+					'image'
+			    ],
 		];
 	}
 

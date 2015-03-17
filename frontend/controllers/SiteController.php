@@ -13,6 +13,7 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use frontend\base\BaseFrontController;
 use common\models\Board;
+use frontend\models\ThreadHandle;
 
 /**
  * Site controller
@@ -219,5 +220,9 @@ class SiteController extends BaseFrontController
 				[
 						'model' => $model
 				]);
+	}
+	public function actionTest(){
+		$threadHandle = new ThreadHandle();
+		$threadHandle->getNewObtainImage(5);
 	}
 }
